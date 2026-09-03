@@ -16,3 +16,9 @@ class ApplicationSerializer(serializers.ModelSerializer):
         if not value.name.endswith('.pdf'):
             raise serializers.ValidationError("Only PDF resumes are supported.")
         return value
+
+
+class ApplicationStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Application
+        fields = ('status',)

@@ -9,6 +9,7 @@ urlpatterns = [
     path('api/auth/', include('users.urls')),  # Includes auth routes
     path('api/jobs/', include('jobs.urls')),
     path('api/applications/', include('applications.urls')),
+    path('api/companies/', include('companies.urls')),
 ]
 
 # Serve media files (Resumes) during development
