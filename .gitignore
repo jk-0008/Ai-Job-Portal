@@ -1,0 +1,16 @@
+# Virtual Environment
+venv/
+
+# Python
+*.pyc
+__pycache__/
+.env
+db.sqlite3
+
+# Media / Uploaded Resumes
+media/resumes/*
+!media/resumes/.gitkeep
+
+# React Frontend
+frontend/node_modules/
+frontend/dist/
