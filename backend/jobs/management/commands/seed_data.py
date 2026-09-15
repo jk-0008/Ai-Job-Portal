@@ -9,7 +9,21 @@ class Command(BaseCommand):
     help = 'Seeds the database with sample companies, jobs, recruiter, and candidate accounts'
 
     def handle(self, *args, **options):
-        self.stdout.write(self.style.NOTICE('Seeding database...'))
+        # 0. Create Superuser
+        admin_user, _ = User.objects.get_or_create(
+            username='admin',
+            defaults={
+                'email': 'admin@jobi.com',
+                'role': 'company_admin',
+                'is_staff': True,
+                'is_superuser': True,
+            }
+        )
+        admin_user.set_password('admin123')
+        admin_user.is_staff = True
+        admin_user.is_superuser = True
+        admin_user.save()
+        self.stdout.write(self.style.SUCCESS('Configured superuser: admin (Password: admin123)'))
 
         # 1. Create Recruiter
         recruiter, created = User.objects.get_or_create(
