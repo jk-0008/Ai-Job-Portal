@@ -21,3 +21,7 @@ backend/media/resumes/*
 frontend/node_modules/
 frontend/dist/
 
+# Staticfiles collected
+staticfiles/
+backend/staticfiles/
+
