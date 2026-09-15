@@ -28,8 +28,29 @@ def serve_react_app(request, *args, **kwargs):
         content_type='text/html'
     )
 
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_root(request, format=None):
+    return Response({
+        'status': 'online',
+        'message': 'Jobi AI Job Portal Backend API is running successfully',
+        'routes': {
+            'jobs': request.build_absolute_uri('/api/jobs/'),
+            'auth_login': request.build_absolute_uri('/api/auth/login/'),
+            'auth_register': request.build_absolute_uri('/api/auth/register/'),
+            'applications': request.build_absolute_uri('/api/applications/'),
+            'companies': request.build_absolute_uri('/api/companies/'),
+            'admin': request.build_absolute_uri('/admin/'),
+        }
+    })
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/', api_root, name='api_root'),
     path('api/auth/', include('users.urls')),  # Includes auth routes
     path('api/jobs/', include('jobs.urls')),
     path('api/applications/', include('applications.urls')),

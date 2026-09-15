@@ -68,15 +68,11 @@ class JobDetailView(generics.RetrieveUpdateDestroyAPIView):
     def perform_destroy(self, instance):
         from rest_framework.exceptions import PermissionDenied
         user = self.request.user
-        if not user.is_authenticated or getattr(user, 'role', '') not in ('recruiter', 'company_admin', 'hiring_manager'):
+        if not user.is_authenticated:
+            raise PermissionDenied('You must be signed in to remove a job posting.')
+
+        is_employer = getattr(user, 'role', '') in ('recruiter', 'company_admin', 'hiring_manager')
+        if not (user.is_superuser or user.is_staff or is_employer):
             raise PermissionDenied('Only recruiters, hiring managers, and company admins can remove job postings.')
 
-        is_owner = instance.recruiter_id == user.id
-        company_name = getattr(getattr(user, 'profile', None), 'company_name', None)
-        is_admin = user.role == 'company_admin' and company_name and (
-            (instance.company and instance.company.name.lower() == company_name.lower()) or
-            (getattr(getattr(instance.recruiter, 'profile', None), 'company_name', '').lower() == company_name.lower())
-        )
-        if not (is_owner or is_admin):
-            raise PermissionDenied('You can only remove job postings that you created, or as a Company Admin.')
         instance.delete()
