@@ -1,7 +1,14 @@
 // src/api.js
 import axios from 'axios';
 
-const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api/';
+const isLocal = typeof window !== 'undefined' && (
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1'
+);
+
+const baseURL = import.meta.env.VITE_API_BASE_URL || (
+  isLocal ? 'http://127.0.0.1:8000/api/' : 'https://ai-job-portal-so5e.onrender.com/api/'
+);
 
 const API = axios.create({
   baseURL,
