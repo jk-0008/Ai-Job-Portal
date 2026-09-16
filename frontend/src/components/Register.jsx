@@ -175,7 +175,7 @@ export default function Register() {
           setError(`${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}: ${errorMsg}`);
         }
       } else {
-        setError('Unable to connect to the registration service. Please verify the backend is running.');
+        setError('Unable to connect to the server. If using the free cloud backend, it may be waking up from sleep (takes ~45-60 seconds on Render). Please wait a moment and tap Register again.');
       }
     } finally {
       setLoading(false);

@@ -67,7 +67,7 @@ export default function Login({ setAuth }) {
       } else if (err.response?.data?.detail) {
         setErrorMessage(err.response.data.detail);
       } else {
-        setErrorMessage('Unable to connect to the authentication service. Please ensure the server is running.');
+        setErrorMessage('Unable to connect to the server. If using the free cloud backend, it may be waking up from sleep (takes ~45-60 seconds on Render). Please wait a moment and try again.');
       }
     } finally {
       setLoading(false);

@@ -3,18 +3,28 @@ import axios from 'axios';
 
 const isLocal = typeof window !== 'undefined' && (
   window.location.hostname === 'localhost' ||
-  window.location.hostname === '127.0.0.1'
+  window.location.hostname === '127.0.0.1' ||
+  window.location.hostname.startsWith('192.168.') ||
+  window.location.hostname.startsWith('10.') ||
+  window.location.hostname.startsWith('172.')
 );
+
+const localBaseURL = typeof window !== 'undefined' && window.location.hostname
+  ? `http://${window.location.hostname}:8000/api/`
+  : 'http://127.0.0.1:8000/api/';
 
 const rawEnvUrl = import.meta.env.VITE_API_BASE_URL || '';
 const hasValidEnvUrl = rawEnvUrl && !rawEnvUrl.includes('<') && !rawEnvUrl.includes('>');
 
-const baseURL = hasValidEnvUrl ? rawEnvUrl : (
-  isLocal ? 'http://127.0.0.1:8000/api/' : 'https://ai-job-portal-so5e.onrender.com/api/'
+export const API_BASE_URL = hasValidEnvUrl ? rawEnvUrl : (
+  isLocal ? localBaseURL : 'https://ai-job-portal-so5e.onrender.com/api/'
 );
 
+export const BACKEND_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, '');
+
 const API = axios.create({
-  baseURL,
+  baseURL: API_BASE_URL,
+  timeout: 60000, // 60s timeout to accommodate Render free-tier cold starts
 });
 
 // Interceptor to inject JWT Access Token into Request Headers
@@ -65,7 +75,7 @@ API.interceptors.response.use(
         isRefreshing = true;
 
         try {
-          const res = await axios.post(`${baseURL}auth/token/refresh/`, {
+          const res = await axios.post(`${API_BASE_URL}auth/token/refresh/`, {
             refresh: refreshToken,
           });
           const newAccessToken = res.data.access;

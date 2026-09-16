@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import API from '../api';
+import API, { BACKEND_ORIGIN } from '../api';
 import jobiIcon from '../assets/jobi-icon.jpg';
 
 export default function RecruiterDashboard() {
@@ -67,8 +67,7 @@ export default function RecruiterDashboard() {
   const userDepartment = companyData?.admin_department || localStorage.getItem('userDepartment') || '';
   const userDesignation = companyData?.admin_designation || localStorage.getItem('userDesignation') || '';
 
-  const backendOrigin = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api/')
-    .replace(/\/api\/?$/, '');
+  const backendOrigin = BACKEND_ORIGIN;
 
   const fetchData = async () => {
     if (userRole === 'job_seeker') return;

@@ -44,7 +44,7 @@ DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
 ALLOWED_HOSTS = ['*'] if DEBUG else [
     host.strip()
-    for host in os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost,testserver').split(',')
+    for host in os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost,testserver,.onrender.com,.vercel.app').split(',')
     if host.strip()
 ]
 

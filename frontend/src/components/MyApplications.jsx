@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import API from '../api';
+import API, { BACKEND_ORIGIN } from '../api';
 
 export default function MyApplications() {
   const [applications, setApplications] = useState([]);
@@ -12,8 +12,7 @@ export default function MyApplications() {
   const userRole = localStorage.getItem('userRole') || 'job_seeker';
   const username = localStorage.getItem('username') || '';
 
-  const backendOrigin = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api/')
-    .replace(/\/api\/?$/, '');
+  const backendOrigin = BACKEND_ORIGIN;
 
   const formatRole = (role) => {
     switch (role) {
