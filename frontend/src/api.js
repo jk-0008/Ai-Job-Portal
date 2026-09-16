@@ -6,7 +6,10 @@ const isLocal = typeof window !== 'undefined' && (
   window.location.hostname === '127.0.0.1'
 );
 
-const baseURL = import.meta.env.VITE_API_BASE_URL || (
+const rawEnvUrl = import.meta.env.VITE_API_BASE_URL || '';
+const hasValidEnvUrl = rawEnvUrl && !rawEnvUrl.includes('<') && !rawEnvUrl.includes('>');
+
+const baseURL = hasValidEnvUrl ? rawEnvUrl : (
   isLocal ? 'http://127.0.0.1:8000/api/' : 'https://ai-job-portal-so5e.onrender.com/api/'
 );
 
