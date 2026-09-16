@@ -10,6 +10,7 @@ User = get_user_model()
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
+    authentication_classes = ()
     serializer_class = UserRegisterSerializer
     parser_classes = (MultiPartParser, FormParser, JSONParser)
 

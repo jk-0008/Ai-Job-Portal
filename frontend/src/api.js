@@ -13,13 +13,30 @@ const localBaseURL = typeof window !== 'undefined' && window.location.hostname
   ? `http://${window.location.hostname}:8000/api/`
   : 'http://127.0.0.1:8000/api/';
 
-const rawEnvUrl = import.meta.env.VITE_API_BASE_URL || '';
-const hasValidEnvUrl = rawEnvUrl && !rawEnvUrl.includes('<') && !rawEnvUrl.includes('>');
+const rawEnvUrl = (import.meta.env.VITE_API_BASE_URL || '').trim();
+const hasPlaceholder = rawEnvUrl.includes('<') || rawEnvUrl.includes('>');
+const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
+// If loaded over HTTPS (like Vercel production), any localhost/127.0.0.1 URL is invalid and causes Mixed Content blocks
+const isUnusableEnv = isHttps && (rawEnvUrl.includes('localhost') || rawEnvUrl.includes('127.0.0.1') || rawEnvUrl.startsWith('http://'));
 
-export const API_BASE_URL = hasValidEnvUrl ? rawEnvUrl : (
-  isLocal ? localBaseURL : 'https://ai-job-portal-so5e.onrender.com/api/'
-);
+let resolvedBaseURL = '';
+if (rawEnvUrl && !hasPlaceholder && !isUnusableEnv) {
+  resolvedBaseURL = rawEnvUrl;
+} else if (isLocal) {
+  resolvedBaseURL = localBaseURL;
+} else {
+  resolvedBaseURL = 'https://ai-job-portal-so5e.onrender.com/api/';
+}
 
+// Ensure proper trailing slash and /api/ route prefix
+if (!resolvedBaseURL.endsWith('/')) {
+  resolvedBaseURL += '/';
+}
+if (!resolvedBaseURL.endsWith('/api/')) {
+  resolvedBaseURL = resolvedBaseURL.replace(/\/?$/, '/api/');
+}
+
+export const API_BASE_URL = resolvedBaseURL;
 export const BACKEND_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, '');
 
 const API = axios.create({
@@ -29,6 +46,13 @@ const API = axios.create({
 
 // Interceptor to inject JWT Access Token into Request Headers
 API.interceptors.request.use((config) => {
+  // Never send an Authorization header to public auth registration or login endpoints
+  if (config.url?.includes('auth/register') || config.url?.includes('auth/login')) {
+    if (config.headers?.Authorization) {
+      delete config.headers.Authorization;
+    }
+    return config;
+  }
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;

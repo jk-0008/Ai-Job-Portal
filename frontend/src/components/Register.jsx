@@ -1,9 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import API from '../api';
 
 export default function Register() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Prevent stale or expired tokens from interfering with registration
+    localStorage.removeItem('token');
+    localStorage.removeItem('refresh');
+  }, []);
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -87,6 +93,11 @@ export default function Register() {
     const file = e.target.files[0];
     if (file && !file.name.toLowerCase().endsWith('.pdf') && file.type !== 'application/pdf') {
       setError('Please upload a valid PDF resume.');
+      setResumeFile(null);
+      return;
+    }
+    if (file && file.size > 10 * 1024 * 1024) {
+      setError('Resume file size must be less than 10MB.');
       setResumeFile(null);
       return;
     }
@@ -175,7 +186,9 @@ export default function Register() {
           setError(`${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}: ${errorMsg}`);
         }
       } else {
-        setError('Unable to connect to the server. If using the free cloud backend, it may be waking up from sleep (takes ~45-60 seconds on Render). Please wait a moment and tap Register again.');
+        const targetHost = err.config?.baseURL || 'backend server';
+        const msg = err.message || (err.code ? `Error: ${err.code}` : 'Connection failed');
+        setError(`Unable to connect to ${targetHost} (${msg}). If the free cloud server is waking up from sleep, please wait 30 seconds and tap Register again.`);
       }
     } finally {
       setLoading(false);
